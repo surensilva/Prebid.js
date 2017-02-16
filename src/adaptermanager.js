@@ -2,6 +2,7 @@
 
 import { flatten, getBidderCodes, shuffle } from './utils';
 import { mapSizes } from './sizeMapping';
+import native from './native';
 
 var utils = require('./utils.js');
 var CONSTANTS = require('./constants.json');
@@ -26,6 +27,13 @@ function getBids({bidderCode, requestId, bidderRequestId, adUnits}) {
           }
           sizes = sizeMapping;
         }
+
+        if (adUnit.nativeParams) {
+          Object.assign(bid, {
+            nativeParams: native(adUnit.nativeParams),
+          });
+        }
+
         return Object.assign({}, bid, {
           placementCode: adUnit.code,
           mediaType: adUnit.mediaType,

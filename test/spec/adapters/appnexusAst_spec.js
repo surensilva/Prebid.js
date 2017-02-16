@@ -244,6 +244,52 @@ describe('AppNexusAdapter', () => {
       expect(response).to.have.property('statusMessage', 'Bid available');
     });
 
+    xit('handles native responses', () => {
+      const backup = RESPONSE.tags[0].ads[0].rtb.banner;
+      delete RESPONSE.tags[0].ads[0].rtb.banner;
+
+      RESPONSE.tags[0].ads[0].rtb.native = {
+        "id": 1,
+        "title": "Cool stuff",
+        "description": "It doesn't get cooler than this.",
+        "sponsored_by": "Cool Company",
+        "icon": {
+          "width": 50,
+          "height": 50,
+          "url": "http://cdn.url/icon.ico"
+        },
+        "main_image": {
+          "width": 250,
+          "height": 250,
+          "url": "http://cdn.url/main.png"
+        },
+        "link": {
+          "url": "http://coolstuff.co",
+          "click_trackers": [
+            "http://ib.adnxs.com/click?e=123"
+          ]
+        },
+        "impression_trackers": [
+          "http://ib.adnxs.com/it?e=123"
+        ],
+        "javascript_trackers": [
+          "http://js_tracker_url"
+        ]
+      };
+
+      server.respondWith(JSON.stringify(RESPONSE));
+
+      adapter.callBids(REQUEST);
+      server.respond();
+      sinon.assert.calledOnce(bidmanager.addBidResponse);
+
+      const response = bidmanager.addBidResponse.firstCall.args[1];
+      expect(response.native.title).to.equal('Cool stuff');
+
+      delete RESPONSE.tags[0].ads[0].rtb.native;
+      RESPONSE.tags[0].ads[0].rtb.banner = backup;
+    });
+
     it('handles JSON.parse errors', () => {
       server.respondWith('');
 
