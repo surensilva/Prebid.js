@@ -244,50 +244,42 @@ describe('AppNexusAdapter', () => {
       expect(response).to.have.property('statusMessage', 'Bid available');
     });
 
-    xit('handles native responses', () => {
-      const backup = RESPONSE.tags[0].ads[0].rtb.banner;
-      delete RESPONSE.tags[0].ads[0].rtb.banner;
-
+    it('handles native responses', () => {
+      RESPONSE.tags[0].ads[0].ad_type = 'native';
       RESPONSE.tags[0].ads[0].rtb.native = {
-        "id": 1,
-        "title": "Cool stuff",
-        "description": "It doesn't get cooler than this.",
-        "sponsored_by": "Cool Company",
-        "icon": {
-          "width": 50,
-          "height": 50,
-          "url": "http://cdn.url/icon.ico"
-        },
-        "main_image": {
-          "width": 250,
-          "height": 250,
-          "url": "http://cdn.url/main.png"
-        },
-        "link": {
-          "url": "http://coolstuff.co",
-          "click_trackers": [
-            "http://ib.adnxs.com/click?e=123"
-          ]
-        },
-        "impression_trackers": [
-          "http://ib.adnxs.com/it?e=123"
-        ],
-        "javascript_trackers": [
-          "http://js_tracker_url"
-        ]
+        "status": "ok",
+        "version": 1,
+        "native": [{
+          "type": "in-feed-standard",
+          "title": "Native Creative",
+          "description": "Great job y'all",
+          "icon_img_url": "http://cdn.adnxs.com/",
+          "main_media": [{
+            "label": "default",
+            "width": 2352,
+            "height": 1516,
+            "url": "http://cdn.adnxs.com/"
+          }],
+          "sponsored_by": "Cool Company",
+          "click_trackers": ["http://example.com"],
+          "impression_trackers": ["http://example.com"],
+          "click_url": "https://www.appnexus.com"
+        }]
       };
 
-      server.respondWith(JSON.stringify(RESPONSE));
-
       adapter.callBids(REQUEST);
+      server.respondWith(JSON.stringify(RESPONSE));
       server.respond();
+
       sinon.assert.calledOnce(bidmanager.addBidResponse);
 
       const response = bidmanager.addBidResponse.firstCall.args[1];
-      expect(response.native.title).to.equal('Cool stuff');
 
-      delete RESPONSE.tags[0].ads[0].rtb.native;
-      RESPONSE.tags[0].ads[0].rtb.banner = backup;
+      expect(response.native.title).to.equal('Native Creative');
+      expect(response.native.description).to.equal('Great job y\'all');
+      expect(response.native.image).to.equal('http://cdn.adnxs.com/');
+
+      RESPONSE.tags[0].ads[0].ad_type = 'banner';
     });
 
     it('handles JSON.parse errors', () => {

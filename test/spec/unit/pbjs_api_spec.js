@@ -753,7 +753,7 @@ describe('Unit: Prebid Module', function () {
       adaptermanager.videoAdapters = videoAdaptersBackup;
     });
 
-    xit('splits native type to individual native assets', () => {
+    it('splits native type to individual native assets', () => {
       $$PREBID_GLOBAL$$._bidsRequested = [];
 
       const adUnits = [{
@@ -766,7 +766,7 @@ describe('Unit: Prebid Module', function () {
 
       $$PREBID_GLOBAL$$.requestBids({adUnits});
 
-      const nativeRequest = $$PREBID_GLOBAL$$._bidsRequested[0].bids[0].native;
+      const nativeRequest = $$PREBID_GLOBAL$$._bidsRequested[0].bids[0].nativeParams;
       expect(nativeRequest).to.deep.equal({
         image: {required: true},
         title: {required: true, len: 80},
