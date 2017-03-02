@@ -29,7 +29,7 @@ function getBids({bidderCode, requestId, bidderRequestId, adUnits}) {
         }
 
         if (adUnit.nativeParams) {
-          Object.assign(bid, {
+          bid = Object.assign({}, bid, {
             nativeParams: native(adUnit.nativeParams),
           });
         }
