@@ -86,9 +86,10 @@
     },
     {
       "appnexusAst": {
-        "supportedMediaTypes": ["video"]
+        "supportedMediaTypes": ["video", "native"]
       }
-    },    {
+    },
+    {
       "vertamedia": {
         "supportedMediaTypes": ["video"]
       }
