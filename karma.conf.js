@@ -28,7 +28,7 @@ module.exports = function (config) {
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['es5-shim', 'mocha', 'expect', 'sinon'],
+    frameworks: ['es6-shim', 'mocha', 'expect', 'sinon'],
 
     client: {
       mocha: {
@@ -116,7 +116,7 @@ module.exports = function (config) {
       'karma-browserstack-launcher',
       'karma-phantomjs-launcher',
       'karma-coverage',
-      'karma-es5-shim',
+      'karma-es6-shim',
       'karma-mocha',
       'karma-expect',
       'karma-sinon-ie',
