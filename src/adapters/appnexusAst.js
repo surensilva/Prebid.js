@@ -5,6 +5,7 @@ import bidmanager from 'src/bidmanager';
 import * as utils from 'src/utils';
 import { ajax } from 'src/ajax';
 import { STATUS } from 'src/constants';
+import { NATIVE_BID_RESPONSE } from 'src/native';
 
 const ENDPOINT = '//ib.adnxs.com/ut/v3/prebid';
 const SUPPORTED_AD_TYPES = ['banner', 'video', 'video-outstream', 'native'];
@@ -156,10 +157,7 @@ function AppnexusAstAdapter() {
       }
 
       tag.bidId = tag.uuid;  // bidfactory looks for bidId on requested bid
-      const bid = createBid(status, tag);
-      if (type === 'native') bid.mediaType = 'native';
-      if (type === 'video') bid.mediaType = 'video';
-      if (type === 'video-outstream') bid.mediaType = 'video-outstream';
+      let bid = createBid(status, tag, type);
       const placement = bidRequests[bid.adId].placementCode;
       bidmanager.addBidResponse(placement, bid);
     });
@@ -256,11 +254,16 @@ function AppnexusAstAdapter() {
   }
 
   /* Create and return a bid object based on status and tag */
-  function createBid(status, tag) {
+  function createBid(status, tag, type) {
     const ad = getRtbBid(tag);
     let bid = bidfactory.createBid(status, tag);
     bid.code = baseAdapter.getBidderCode();
     bid.bidderCode = baseAdapter.getBidderCode();
+
+    // set up bid properties required for supported media types
+    if (type === 'native') bid = Object.assign({}, bid, NATIVE_BID_RESPONSE);
+    if (type === 'video') bid.mediaType = 'video';
+    if (type === 'video-outstream') bid.mediaType = 'video-outstream';
 
     if (ad && status === STATUS.GOOD) {
       bid.cpm = ad.cpm;
@@ -304,15 +307,13 @@ function AppnexusAstAdapter() {
         }
       } else if (ad.rtb.native) {
         const native = ad.rtb.native;
-        bid.native = {
-          title: native.title,
-          body: native.description,
-          sponsored_by: native.sponsored_by,
-          image: native.main_img && native.main_img.url,
-          icon: native.icon && native.icon.url,
-          click_url: native.link.url,
-          impression_trackers: native.impression_trackers,
-        };
+        bid.native.title = native.title;
+        bid.native.body = native.description;
+        bid.native.sponsored_by = native.sponsored_by;
+        bid.native.image = native.main_img && native.main_img.url;
+        bid.native.icon = native.icon && native.icon.url;
+        bid.native.click_url = native.link.url;
+        bid.native.impression_trackers = native.impression_trackers;
       } else {
         bid.width = ad.rtb.banner.width;
         bid.height = ad.rtb.banner.height;

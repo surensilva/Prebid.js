@@ -2,6 +2,10 @@ import { getBidRequest, logError } from './utils';
 // import { nativeAdapters } from './adaptermanager';
 const nativeAdapters = ['appnexusAst'];
 
+/*
+ * native bids with the following keys will be sent to the adserver with the
+ * corresponding values
+ */
 export const NATIVE_KEYS = {
   title: 'hb_native_title',
   body: 'hb_native_body',
@@ -15,6 +19,16 @@ export const NATIVE_TARGETING_KEYS = Object.keys(NATIVE_KEYS).map(
   key => NATIVE_KEYS[key]
 );
 
+// native bid response template for adding to bidmanager.createBid
+export const NATIVE_BID_RESPONSE = Object.assign({}, {
+  mediaType: 'native',
+  native: Object.keys(NATIVE_KEYS).reduce((acc, cur) => {
+    acc[cur] = null;
+    return acc;
+  }, {})
+});
+
+// a native image type will be expanded to this set of assets
 const IMAGE = {
   image: {required: true},
   title: {required: true},
